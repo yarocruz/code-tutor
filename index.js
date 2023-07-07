@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { OpenAI } = require("langchain/llms/openai");
+const { PromptTemplate } = require("langchain/prompts");
 const inquirer = require("inquirer");
 
 const model = new OpenAI({
@@ -10,7 +11,14 @@ const model = new OpenAI({
 
 const prompt = async (input) => {
     try {
-        const res = await model.call(input);
+        const p = new PromptTemplate({
+            template: "You are a JavaScript expert and will answer the user's coding question thouroughly as possible.\n{question}",
+            inputVariables: ["question"],
+        })
+        const promptInput = await p.format({
+            question: input
+        })
+        const res = await model.call(promptInput);
         console.log(res)
     } catch (err) {
         console.log(err);
